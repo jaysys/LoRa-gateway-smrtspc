@@ -1,11 +1,115 @@
 
-#### 시스템 구성
+좋은 질문입니다!
+LoRa는 단말(Node)에서 데이터를 **무선으로 전송**하므로, 이를 \*\*수신하고 처리하는 별도의 장치 또는 서버(게이트웨이 및 서버)\*\*가 필요합니다.
+아래에 **LoRa 네트워크의 기본 구성**과 **수신 서버 구성 방법**을 정리해드릴게요.
 
+---
+
+## 🧭 LoRa 네트워크 구성 요소
+
+```
 [LoRa Node] → → → [LoRa Gateway] → → → [네트워크 서버] → [애플리케이션 서버 / DB / 클라우드]
+```
+
+| 구성 요소                         | 설명                              |
+| ----------------------------- | ------------------------------- |
+| **LoRa Node**                 | 센서 또는 장치 (ESP32 + LoRa 모듈 등)    |
+| **LoRa Gateway**              | LoRa 무선신호 → IP 패킷으로 변환 (중계기 역할) |
+| **LoRa Network Server (LNS)** | 장치 인증, 라우팅, 중복 제거, 메시지 필터링 등    |
+| **Application Server**        | 사용자 데이터 저장, 시각화, 알림 등           |
+
+---
+
+## 1. 🛰 **LoRa Gateway (수신기 역할) 구성 방법**
+
+### ✅ 1.1 상용 LoRa 게이트웨이 사용
+
+* 예시:
+
+  * **RAK Wireless** (RAK7249, RAK7258 등)
+  * **Dragino LG01 / LG308**
+  * **TTN Gateway (The Things Network Gateway)**
+* 특징:
+
+  * 여러 노드의 LoRa 데이터를 동시에 수신 가능
+  * 이더넷/Wi-Fi/4G 통해 인터넷 전송
+
+### ✅ 1.2 직접 구성: **라즈베리파이 + LoRa Concentrator**
+
+* **필요 부품**:
+
+  * Raspberry Pi 3/4/5
+  * SX1302 or SX1301 LoRa Concentrator (RAK2245/RAK2287 등)
+* **설치 소프트웨어**:
+
+  * [LoRa Packet Forwarder](https://github.com/Lora-net/packet_forwarder)
+  * [TTN Gateway Bridge](https://github.com/TheThingsNetwork/packet-forwarder)
+* **기능**:
+
+  * LoRa 패킷 수신 → MQTT or UDP로 서버로 전달
+
+---
+
+## 2. 🌐 LoRa Network Server (LNS) 구성
+
+### ✅ 2.1 공개/클라우드 네트워크 사용
+
+* **The Things Network (TTN)**: 무료로 글로벌 LoRaWAN 서버 제공
+
+  * [https://www.thethingsnetwork.org/](https://www.thethingsnetwork.org/)
+  * 게이트웨이를 등록하고, Application → Device 설정하면 바로 사용 가능
+  * 데이터는 MQTT/Webhook/HTTP API 등으로 연동 가능
+
+### ✅ 2.2 자체 서버 구축 (사설망)
+
+* **ChirpStack** (오픈소스 LoRa 서버 플랫폼)
+
+  * Docker 또는 리눅스 서버에 설치 가능
+  * UI 포함 / MQTT로 애플리케이션 연동
+  * [https://www.chirpstack.io/](https://www.chirpstack.io/)
+* 서버 구조:
+
+  * Gateway Bridge
+  * Network Server
+  * Application Server
+  * PostgreSQL + Redis
+
+---
+
+## 3. 📥 수신 데이터 처리 예시
+
+| 방식      | 기술 스택                                           | 설명          |
+| ------- | ----------------------------------------------- | ----------- |
+| MQTT    | ChirpStack / TTN → MQTT Broker → Python/Node.js | 실시간 처리      |
+| Webhook | TTN/ChirpStack → HTTP 서버 (Flask/Express 등)      | REST API 기반 |
+| 데이터 저장  | MySQL, InfluxDB, Firebase 등                     | 추후 시각화 / 분석 |
+| 시각화     | Grafana, Node-RED, Vue.js 등                     | 대시보드 구성 가능  |
+
+---
+
+## 🎯 예시 구성: 직접 LoRa 수신 서버 운영
+
+| 구성 요소  | 선택 예시                                    |
+| ------ | ---------------------------------------- |
+| 게이트웨이  | Dragino LG01-P 또는 Raspberry Pi + RAK2245 |
+| 서버     | Ubuntu + ChirpStack or TTN Cloud         |
+| 데이터 처리 | Python + MQTT or Webhook                 |
+| 저장소    | SQLite / InfluxDB / Firebase             |
+| 시각화    | Grafana or Node-RED or 웹앱                |
+
+---
+
+* **LoRa 통신은 직접 서버를 구축하거나, TTN 같은 무료 클라우드 플랫폼을 이용하여 수신할 수 있습니다.**
+* **게이트웨이는 LoRa 전파를 인터넷으로 전환하는 다리 역할**을 하며,
+* \*\*LNS(Network Server)\*\*는 인증, 라우팅, 중복 제거 등을 담당합니다.
+* 최종 데이터는 웹 서버, MQTT 브로커, 데이터베이스, 대시보드 등에 연결되어 활용됩니다.
 
 --
 
-LoRa Gateway
+현재 폴더에 구성된 소스 리포지터리는 LoRa Gateway를 구성에 필요한 소스를 담고 있습니다.
+
+Lora network packet forwarder project
+======================================
 
   	/ _____)             _              | |    
 	( (____  _____ ____ _| |_ _____  ____| |__  
@@ -14,8 +118,6 @@ LoRa Gateway
 	(______/|_____)_|_|_| \__)_____)\____)_| |_|
 	  (C)2013 Semtech-Cycleo
 
-Lora network packet forwarder project
-======================================
 
 1. Core program: lora_pkt_fwd
 -------------------------------
