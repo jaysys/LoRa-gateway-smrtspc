@@ -39,10 +39,9 @@ LoRa 네트워크의 기본 구성과 수신 서버 구성 방법을 정리합�
 
   * Raspberry Pi 3/4/5
   * SX1302 or SX1301 LoRa Concentrator (RAK2245/RAK2287 등)
-* **설치 소프트웨어**:
+* **소프트웨어**:
 
   * [LoRa Packet Forwarder](https://github.com/Lora-net/packet_forwarder)
-  * [TTN Gateway Bridge](https://github.com/TheThingsNetwork/packet-forwarder)
 * **기능**:
 
   * LoRa 패킷 수신 → MQTT or UDP로 서버로 전달
