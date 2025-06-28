@@ -284,6 +284,8 @@ void loop() {
 
 ---
 
+패킷 포워더는 LoRa 게이트웨이의 호스트에서 실행되는 프로그램으로, 컨센트레이터가 수신한 RF 패킷을 IP/UDP 링크를 통해 서버로 전달하고, 서버에서 보낸 RF 패킷을 방출합니다. 또한 네트워크 전체에 걸쳐 GPS 동기화 비콘 신호를 방출하여 모든 노드의 동기화를 조정하는 데 사용할 수 있습니다.
+
 The packet forwarder is a program running on the host of a Lora gateway that
 forwards RF packets receive by the concentrator to a server through a IP/UDP
 link, and emits RF packets that are sent by the server. It can also emit a
